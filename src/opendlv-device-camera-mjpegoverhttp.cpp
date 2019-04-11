@@ -112,8 +112,10 @@ void decodeCompressedJPEGFrame(unsigned char *ptr, int len) {
                 }
             }
 
-            // Decompress JPEG.
-            tjDecompress2(g_jpegDecompressor, ptr, len, rawImageBGR24, width, 0 /*pitch*/, height, TJPF_RGB, TJFLAG_FASTDCT);
+            // Decompress JPEG when necessary.
+            if (!SKIP_I420 || !SKIP_ARGB /* ARGB conversion needs I420. */) {
+                tjDecompress2(g_jpegDecompressor, ptr, len, rawImageBGR24, width, 0 /*pitch*/, height, TJPF_RGB, TJFLAG_FASTDCT);
+            }
 
             sharedMemoryI420->lock();
             sharedMemoryI420->setTimeStamp(ts);
