@@ -33,6 +33,8 @@ uint32_t WIDTH{0};
 uint32_t HEIGHT{0};
 uint32_t ID{0};
 bool VERBOSE{false};
+bool SKIP_I420{false};
+bool SKIP_ARGB{false};
 
 std::unique_ptr<cluon::OD4Session> od4Session{nullptr};
 std::unique_ptr<cluon::SharedMemory> sharedMemoryI420{nullptr};
@@ -115,7 +117,7 @@ void decodeCompressedJPEGFrame(unsigned char *ptr, int len) {
 
             sharedMemoryI420->lock();
             sharedMemoryI420->setTimeStamp(ts);
-            {
+            if (!SKIP_I420 || !SKIP_ARGB /* ARGB conversion needs I420. */) {
                 libyuv::RAWToI420(reinterpret_cast<uint8_t*>(rawImageBGR24), WIDTH * 3 /* 3*WIDTH for RGB24*/,
                                     reinterpret_cast<uint8_t*>(sharedMemoryI420->data()), WIDTH,
                                     reinterpret_cast<uint8_t*>(sharedMemoryI420->data()+(WIDTH * HEIGHT)), WIDTH/2,
@@ -126,7 +128,7 @@ void decodeCompressedJPEGFrame(unsigned char *ptr, int len) {
 
             sharedMemoryARGB->lock();
             sharedMemoryARGB->setTimeStamp(ts);
-            {
+            if (!SKIP_ARGB) {
                 libyuv::I420ToARGB(reinterpret_cast<uint8_t*>(sharedMemoryI420->data()), WIDTH,
                                    reinterpret_cast<uint8_t*>(sharedMemoryI420->data()+(WIDTH * HEIGHT)), WIDTH/2,
                                    reinterpret_cast<uint8_t*>(sharedMemoryI420->data()+(WIDTH * HEIGHT + ((WIDTH * HEIGHT) >> 2))), WIDTH/2,
@@ -232,6 +234,8 @@ int32_t main(int32_t argc, char **argv) {
         std::cerr << "         --width:     desired width of a frame" << std::endl;
         std::cerr << "         --height:    desired height of a frame" << std::endl;
         std::cerr << "         --freq:      desired frame rate" << std::endl;
+        std::cerr << "         --skip.i420: don't decode MJPEG frame into i420 format; default: false" << std::endl;
+        std::cerr << "         --skip.argb: don't decode MJPEG frame into argb format; default: false" << std::endl;
         std::cerr << "         --verbose:   display captured image" << std::endl;
         std::cerr << "Example: " << argv[0] << " --url=http://192.168.0.11?mjpeg --width=640 --height=480 --verbose --rec=myFile.rec --cid=111 --remote" << std::endl;
     } else {
@@ -242,6 +246,8 @@ int32_t main(int32_t argc, char **argv) {
         WIDTH = static_cast<uint32_t>(std::stoi(commandlineArguments["width"]));
         HEIGHT = static_cast<uint32_t>(std::stoi(commandlineArguments["height"]));
         VERBOSE = (commandlineArguments.count("verbose") != 0);
+        SKIP_I420 = (commandlineArguments.count("skip.i420") != 0);
+        SKIP_ARGB = (commandlineArguments.count("skip.argb") != 0);
 
         sharedMemoryI420.reset(new cluon::SharedMemory{NAME_I420, WIDTH * HEIGHT * 3/2});
         if (!sharedMemoryI420 || !sharedMemoryI420->valid()) {

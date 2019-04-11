@@ -40,7 +40,7 @@ To run this microservice using our pre-built Docker multi-arch images to open
 an OpenCV-encapsulated camera, simply start it as follows:
 
 ```
-docker run --rm -ti --init --ipc=host --net=host -e DISPLAY=$DISPLAY -v /tmp:/tmp chalmersrevere/opendlv-device-camera-mjpegoverhttp-multi:v0.0.2 --url=http://192.168.0.123/myStream.mjpeg --width=640 --height=480
+docker run --rm -ti --init --ipc=host --net=host -e DISPLAY=$DISPLAY -v /tmp:/tmp chalmersrevere/opendlv-device-camera-mjpegoverhttp-multi:v0.0.3 --url=http://192.168.0.123/myStream.mjpeg --width=640 --height=480
 ```
 
 If you want to display the captured frames, simply append `--verbose` to the
@@ -48,9 +48,19 @@ commandline above; you might also need to enable access to your X11 server: `xho
 
 The parameters to the application are:
 * `--cid`: CID of the OD4Session to listen for cluon.data.RecorderCommand
+* `--id:`: ID to use in case of multiple instances
 * `--rec`: name of the recording file; default: YYYY-MM-DD_HHMMSS.rec
 * `--recsuffix`: additional suffix to add to the .rec file
 * `--remote`: listen for cluon.data.RecorderCommand to start/stop recording
+* `--url`:       URL providing an MJPEG stream over http
+* `--name.i420`: name of the shared memory for the I420 formatted image; when omitted, video0.i420 is chosen
+* `--name.argb`: name of the shared memory for the I420 formatted image; when omitted, video0.argb is chosen
+* `--width`:     desired width of a frame
+* `--height`:    desired height of a frame
+* `--freq`:      desired frame rate
+* `--skip.i420`: don't decode MJPEG frame into i420 format; default: false
+* `--skip.argb`: don't decode MJPEG frame into argb format; default: false
+* `--verbose`:   display captured image
 
 
 ## License
