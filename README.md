@@ -15,7 +15,6 @@ This software is based in part on the work of the Independent JPEG Group.
 ## Table of Contents
 * [Dependencies](#dependencies)
 * [Usage](#usage)
-* [Build from sources on the example of Ubuntu 16.04 LTS](#build-from-sources-on-the-example-of-ubuntu-1604-lts)
 * [License](#license)
 
 
