@@ -1,3 +1,5 @@
+Moved to https://git.opendlv.org.
+
 ## OpenDLV Microservice to interface with MJPEG-over-HTTP-encapsulated video streams
 
 This repository provides source code to interface with cameras providing an
